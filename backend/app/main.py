@@ -14,12 +14,14 @@ app = FastAPI(title=settings.app_name)
 # ✅ CORS MUST BE FIRST
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://job-flow-frontend.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # Routers
 app.include_router(health_router)
 app.include_router(auth_router)
