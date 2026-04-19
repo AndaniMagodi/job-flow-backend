@@ -14,3 +14,4 @@ class Application(Base):
     date_applied: Mapped[date] = mapped_column(Date(), nullable=False)
     link: Mapped[str | None] = mapped_column(Text(), nullable=True)
     notes: Mapped[str | None] = mapped_column(Text(), nullable=True)
+    follow_up_date: Mapped[date | None] = mapped_column(Date(), nullable=True)
