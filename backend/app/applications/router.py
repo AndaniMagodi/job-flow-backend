@@ -16,7 +16,6 @@ router = APIRouter(prefix="/applications", tags=["applications"])
 
 
 
-# GET ALL
 @router.get("", response_model=List[ApplicationResponse])
 def get_applications(
     db: Session = Depends(get_db),
@@ -27,7 +26,6 @@ def get_applications(
     ).order_by(Application.id.desc()).all()
 
 
-# CREATE
 @router.post("", response_model=ApplicationResponse)
 def create_application(
     body: ApplicationCreate,
@@ -52,7 +50,6 @@ def create_application(
     return app
 
 
-# UPDATE STATUS
 @router.patch("/{app_id}/status", response_model=ApplicationResponse)
 def update_status(
     app_id: int,
@@ -87,7 +84,6 @@ def update_status(
     return app
 
 
-# DELETE
 @router.delete("/{app_id}")
 def delete_application(
     app_id: int,
@@ -108,7 +104,6 @@ def delete_application(
     return {"ok": True}
 
 
-# ADD NOTE
 @router.post("/{app_id}/notes", response_model=ApplicationResponse)
 def add_note(
     app_id: int,
