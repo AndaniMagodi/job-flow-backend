@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.db.session import get_db
-from app.auth.dependencies import require_user
+from app.auth.dependencies import get_current_user
 from app.models.users import User
 from app.models.applications import Application
 from app.activities.service import log_activity
@@ -19,7 +19,7 @@ router = APIRouter(prefix="/applications", tags=["applications"])
 @router.get("", response_model=List[ApplicationResponse])
 def get_applications(
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_user)
+    current_user: User = Depends(get_current_user)
 ):
     return db.query(Application).filter(
         Application.user_id == current_user.id
@@ -30,7 +30,7 @@ def get_applications(
 def create_application(
     body: ApplicationCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_user)
+    current_user: User = Depends(get_current_user)
 ):
     app = Application(**body.model_dump(), user_id=current_user.id)
 
@@ -55,7 +55,7 @@ def update_status(
     app_id: int,
     body: ApplicationUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_user)
+    current_user: User = Depends(get_current_user)
 ):
     if body.status not in {"Applied", "Interview", "Offer", "Rejected"}:
         raise HTTPException(status_code=400, detail="Invalid status")
@@ -88,7 +88,7 @@ def update_status(
 def delete_application(
     app_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_user)
+    current_user: User = Depends(get_current_user)
 ):
     app = db.query(Application).filter(
         Application.id == app_id,
@@ -109,7 +109,7 @@ def add_note(
     app_id: int,
     body: dict,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_user)
+    current_user: User = Depends(get_current_user)
 ):
     app = db.query(Application).filter(
         Application.id == app_id,
@@ -138,7 +138,7 @@ def set_follow_up(
     app_id: int,
     body: FollowUpUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_user)
+    current_user: User = Depends(get_current_user)
 ):
     app = db.query(Application).filter(
         Application.id == app_id,
@@ -165,7 +165,7 @@ def set_follow_up(
 @router.get("/due", response_model=List[ApplicationResponse])
 def get_due_applications(
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_user)
+    current_user: User = Depends(get_current_user)
 ):
     today = date.today()
     return db.query(Application).filter(

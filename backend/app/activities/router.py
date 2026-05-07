@@ -5,7 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.db.session import get_db
-from app.auth.dependencies import require_user
+from app.auth.dependencies import get_current_user
 from app.models.users import User
 from app.models.activities import Activity
 
@@ -26,7 +26,7 @@ class ActivityResponse(BaseModel):
 @router.get("", response_model=List[ActivityResponse])
 def get_all_activities(
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_user)
+    current_user: User = Depends(get_current_user)
 ):
     return db.query(Activity).filter(
         Activity.user_id == current_user.id
@@ -38,7 +38,7 @@ def get_all_activities(
 def get_application_activities(
     app_id: int,
     db: Session = Depends(get_db),
-    current_user: User = Depends(require_user)
+    current_user: User = Depends(get_current_user)
 ):
     return db.query(Activity).filter(
         Activity.application_id == app_id,
