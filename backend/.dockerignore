@@ -1,0 +1,21 @@
+# Secrets must never be baked into the image — Cloud Run injects them as
+# environment variables at deploy time instead.
+.env
+.env.*
+!.env.example
+
+# Local virtualenvs (~300MB, and built for the host, not the container)
+venv/
+.venv/
+
+# Python artefacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Not needed at runtime
+tests/
+.git/
+.gitignore
+*.md
