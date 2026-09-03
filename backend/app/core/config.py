@@ -23,6 +23,16 @@ class Settings(BaseSettings):
     # Used in alert messages so recipients get a working link.
     frontend_url: str = "http://localhost:5173"
 
+    # --- Email (SMTP) ----------------------------------------------------
+    # Works with Gmail (app password), Resend, SendGrid, Mailgun or a relay.
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str | None = None
+    smtp_from_name: str = "JobFlow"
+    smtp_use_tls: bool = True
+
     # --- Notifications ---------------------------------------------------
     # WhatsApp via Meta's Cloud API. Business-initiated messages must use an
     # approved template, hence the template name and language.

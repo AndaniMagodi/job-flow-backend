@@ -21,20 +21,32 @@ class AlertFilters(BaseModel):
     no_experience_required: Optional[bool] = None
 
 
+VALID_CHANNELS = {"whatsapp", "email"}
+
+
 class AlertCreate(BaseModel):
     name: str = Field(min_length=2, max_length=120)
     filters: AlertFilters = Field(default_factory=AlertFilters)
     channel: str = "whatsapp"
-    destination: str
+    #: A mobile number for WhatsApp; blank for email, which uses the account
+    #: address the user already verified.
+    destination: str = ""
+
+    @field_validator("channel")
+    @classmethod
+    def check_channel(cls, v: str) -> str:
+        if v not in VALID_CHANNELS:
+            raise ValueError(f"channel must be one of: {', '.join(sorted(VALID_CHANNELS))}")
+        return v
 
     @field_validator("destination")
     @classmethod
     def check_destination(cls, v: str, info) -> str:
         # Catch a mistyped number when it is saved, not weeks later when an
         # alert silently fails to arrive.
-        if (info.data or {}).get("channel", "whatsapp") == "whatsapp":
+        if (info.data or {}).get("channel") == "whatsapp":
             return normalise_sa_mobile(v)
-        return v
+        return v.strip()
 
 
 class AlertUpdate(BaseModel):

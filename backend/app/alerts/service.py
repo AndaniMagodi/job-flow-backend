@@ -92,9 +92,15 @@ def run_alert(db: Session, alert: JobAlert, base_url: str, dry_run: bool = False
         return {"alert_id": alert.id, "matched": len(jobs), "sent": False, "preview": body}
 
     try:
-        get_channel(alert.channel).send(
-            Message(to=alert.destination, body=body, url=f"{base_url}/jobs")
-        )
+        channel = get_channel(alert.channel)
+        # No `url` here: build_message_body already ends with the link, and a
+        # channel that appends url would print it twice.
+        message = Message(to=alert.destination, body=body)
+        if channel.name == "email":
+            subject = f"{len(jobs)} new {'job' if len(jobs) == 1 else 'jobs'}: {alert.name}"
+            channel.send(message, subject=subject)
+        else:
+            channel.send(message)
     except NotificationError as e:
         logger.warning("alert %s could not be delivered: %s", alert.id, e)
         return {"alert_id": alert.id, "matched": len(jobs), "sent": False, "error": str(e)}
