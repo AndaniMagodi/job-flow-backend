@@ -17,10 +17,14 @@ logger = logging.getLogger(__name__)
 class ConsoleChannel(NotificationChannel):
     name = "console"
 
-    def send(self, message: Message) -> None:
-        logger.info(
-            "[notification] to=%s\n%s%s",
+    def send(self, message: Message, subject: str | None = None) -> None:
+        # Logged at WARNING, not INFO: this channel means a message was NOT
+        # delivered, and uvicorn's default config hides INFO from app loggers —
+        # which would make the development fallback silently useless.
+        logger.warning(
+            "[notification NOT SENT — no channel configured] to=%s%s\n%s%s",
             message.to,
+            f"\nsubject={subject}" if subject else "",
             message.body,
             f"\n{message.url}" if message.url else "",
         )

@@ -61,6 +61,15 @@ def create_alert(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    # Alerts send messages on the user's behalf, so the address or number has
+    # to belong to someone who proved they own this account. Browsing stays
+    # open to everyone; only outbound messaging is gated.
+    if not current_user.is_verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Confirm your email address before creating alerts.",
+        )
+
     count = db.query(JobAlert).filter(JobAlert.user_id == current_user.id).count()
     if count >= MAX_ALERTS_PER_USER:
         raise HTTPException(
@@ -68,12 +77,18 @@ def create_alert(
             detail=f"You can have at most {MAX_ALERTS_PER_USER} alerts",
         )
 
+    # Email alerts go to the address they verified, never a free-text one —
+    # otherwise an account becomes a way to send mail to strangers.
+    destination = current_user.email if body.channel == "email" else body.destination
+    if not destination:
+        raise HTTPException(status_code=400, detail="A destination is required")
+
     alert = JobAlert(
         user_id=current_user.id,
         name=body.name,
         filters=json.dumps(body.filters.model_dump(exclude_none=True)),
         channel=body.channel,
-        destination=body.destination,
+        destination=destination,
     )
     db.add(alert)
     db.commit()
@@ -94,12 +109,8 @@ def update_alert(
         alert.name = body.name
     if body.filters is not None:
         alert.filters = json.dumps(body.filters.model_dump(exclude_none=True))
-    if body.destination is not None:
-        alert.destination = (
-            normalise_sa_mobile(body.destination)
-            if alert.channel == "whatsapp"
-            else body.destination
-        )
+    if body.destination is not None and alert.channel == "whatsapp":
+        alert.destination = normalise_sa_mobile(body.destination)
     if body.is_active is not None:
         alert.is_active = body.is_active
 

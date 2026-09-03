@@ -9,10 +9,12 @@ from app.notifications.base import (
     normalise_sa_mobile,
 )
 from app.notifications.console import ConsoleChannel
+from app.notifications.email import EmailChannel
 from app.notifications.whatsapp import WhatsAppChannel
 
 _REGISTRY: dict[str, type[NotificationChannel]] = {
     WhatsAppChannel.name: WhatsAppChannel,
+    EmailChannel.name: EmailChannel,
     ConsoleChannel.name: ConsoleChannel,
 }
 
@@ -44,6 +46,7 @@ def available_channels() -> list[str]:
 __all__ = [
     "ChannelUnavailableError",
     "ConsoleChannel",
+    "EmailChannel",
     "Message",
     "NotificationChannel",
     "NotificationError",
