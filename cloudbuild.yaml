@@ -75,10 +75,10 @@ steps:
       - '--port=8080'
       - '--add-cloudsql-instances=${_SQL_INSTANCE}'
       # Secrets are referenced, never written into this file or the image.
-      - '--set-secrets=DATABASE_URL=DATABASE_URL:latest,SECRET_KEY=SECRET_KEY:latest,GROQ_API_KEY=GROQ_API_KEY:latest,ADZUNA_APP_ID=ADZUNA_APP_ID:latest,ADZUNA_APP_KEY=ADZUNA_APP_KEY:latest'
+      - '--set-secrets=DATABASE_URL=DATABASE_URL:latest,SECRET_KEY=SECRET_KEY:latest,GROQ_API_KEY=GROQ_API_KEY:latest,ADZUNA_APP_ID=ADZUNA_APP_ID:latest,ADZUNA_APP_KEY=ADZUNA_APP_KEY:latest,SMTP_HOST=SMTP_HOST:latest,SMTP_USERNAME=SMTP_USERNAME:latest,SMTP_PASSWORD=SMTP_PASSWORD:latest,SMTP_FROM=SMTP_FROM:latest'
       # ^##^ is gcloud's custom-delimiter syntax. JOB_SOURCES contains a comma,
       # which the default parser would read as the end of the value.
-      - '--set-env-vars=^##^APP_ENV=production##JOB_SOURCES=greenhouse,adzuna##GROQ_MODEL=openai/gpt-oss-120b##FRONTEND_URL=https://job-flow-frontend.vercel.app'
+      - '--set-env-vars=^##^APP_ENV=production##JOB_SOURCES=greenhouse,adzuna##GROQ_MODEL=openai/gpt-oss-120b##FRONTEND_URL=https://job-flow-frontend.vercel.app##SMTP_PORT=587##SMTP_USE_TLS=true##SMTP_FROM_NAME=JobFlow'
       - '--quiet'
 
 images:
