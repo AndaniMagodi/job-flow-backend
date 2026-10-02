@@ -2,7 +2,7 @@
 
 REST API for [JobFlow](https://github.com/AndaniMagodi/job-flow-frontend), a South African job board with a built-in application tracker. Browse and search real SA listings, then track every application you make. Built with FastAPI and PostgreSQL.
 
-**Live API:** [jobflow-api.onrender.com](https://jobflow-api.onrender.com) <!-- replace with your URL -->  
+**Live app:** [JobFlow](https://job-flow-frontend.vercel.app)  
 **Frontend Repo:** [job-flow-frontend](https://github.com/AndaniMagodi/job-flow-frontend)
 
 ---
@@ -19,7 +19,7 @@ REST API for [JobFlow](https://github.com/AndaniMagodi/job-flow-frontend), a Sou
 | Authentication | JWT (python-jose + bcrypt + passlib) |
 | Config | pydantic-settings |
 | Server | Uvicorn |
-| Deployment | Render |
+| Deployment | Google Cloud Run (Cloud Build) |
 
 ---
 
@@ -64,7 +64,7 @@ REST API for [JobFlow](https://github.com/AndaniMagodi/job-flow-frontend), a Sou
 
 ```bash
 git clone https://github.com/AndaniMagodi/job-flow-backend.git
-cd job-flow-backend
+cd job-flow-backend/backend
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -72,7 +72,7 @@ pip install -r requirements.txt
 
 ### Environment Variables
 
-Create a `.env` file in the root:
+Create a `.env` file in `backend/`:
 
 See [`backend/.env.example`](backend/.env.example) for the full list.
 
@@ -222,7 +222,7 @@ came from.
 
 ## Deployment
 
-Deployed to **Google Cloud Run** in `africa-south1` — the region closest to the
+The deployment pipeline targets **Google Cloud Run** in `africa-south1` — the region closest to the
 users this board serves — via the Cloud Build pipeline in `cloudbuild.yaml`.
 
 The pipeline builds the image, runs `alembic upgrade head` as a Cloud Run job,
@@ -257,4 +257,4 @@ Non-secret configuration (`JOB_SOURCES`, `GROQ_MODEL`, `FRONTEND_URL`,
 
 The frontend reads `VITE_API_URL` **at build time**, so changing the backend URL
 requires a redeploy of the frontend, not just an environment change. The backend
-must also list the frontend's origin in the CORS block in `app/main.py`.
+must also list the frontend's origin in the CORS block in `backend/app/main.py`.
