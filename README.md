@@ -2,7 +2,8 @@
 
 REST API for [JobFlow](https://github.com/AndaniMagodi/job-flow-frontend), a South African job board with a built-in application tracker. Browse and search real SA listings, then track every application you make. Built with FastAPI and PostgreSQL.
 
-**Live app:** [JobFlow](https://job-flow-frontend.vercel.app)  
+**Live app:** [JobFlow](https://job-flow-frontend.vercel.app)
+**Live API:** Deployment in progress.
 **Frontend Repo:** [job-flow-frontend](https://github.com/AndaniMagodi/job-flow-frontend)
 
 ---
@@ -19,7 +20,7 @@ REST API for [JobFlow](https://github.com/AndaniMagodi/job-flow-frontend), a Sou
 | Authentication | JWT (python-jose + bcrypt + passlib) |
 | Config | pydantic-settings |
 | Server | Uvicorn |
-| Deployment | Google Cloud Run (Cloud Build) |
+| Deployment | Render + Neon |
 
 ---
 
@@ -113,7 +114,7 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-API runs at `http://localhost:8000`  
+API runs at `http://localhost:8000`
 Interactive docs at `http://localhost:8000/docs`
 
 ---
@@ -222,39 +223,22 @@ came from.
 
 ## Deployment
 
-The deployment pipeline targets **Google Cloud Run** in `africa-south1` — the region closest to the
-users this board serves — via the Cloud Build pipeline in `cloudbuild.yaml`.
+The Render Blueprint in `render.yaml` deploys the API from `backend/`. It runs
+the Alembic migrations before starting Uvicorn and checks `/health`, which also
+verifies the database connection.
 
-The pipeline builds the image, runs `alembic upgrade head` as a Cloud Run job,
-and only then rolls out the new revision. Migrations run as a job rather than on
-container start so a scale-out never has two instances migrating at once, and a
-failed migration stops the pipeline before the bad revision serves traffic.
+Create a free PostgreSQL project in Neon and set its connection string as
+`DATABASE_URL` in Render. Render generates the `SECRET_KEY` automatically. Keep
+the database URL in Render's environment settings; never commit it to Git. `FRONTEND_URL` is
+used for CORS and alert links. Optional integrations such as Groq and email can
+be added later through Render environment settings.
 
-### Secrets
-
-Secrets are held in Secret Manager and referenced by the deploy — never written
-into `cloudbuild.yaml`, and never baked into the image (see
-`backend/.dockerignore`). The service expects these to exist:
-
-| Secret | Purpose |
-|---|---|
-| `DATABASE_URL` | Cloud SQL connection string |
-| `SECRET_KEY` | JWT signing key |
-| `GROQ_API_KEY` | CV matching and natural-language search |
-| `ADZUNA_APP_ID` | Adzuna South Africa listings |
-| `ADZUNA_APP_KEY` | Adzuna South Africa listings |
-
-Create or update one with:
-
-```bash
-printf '%s' 'the-value' | gcloud secrets create GROQ_API_KEY --data-file=- --project=<project>
-```
-
-Non-secret configuration (`JOB_SOURCES`, `GROQ_MODEL`, `FRONTEND_URL`,
-`APP_ENV`) is set as plain environment variables in the deploy step.
+Render's free web services sleep after 15 minutes without traffic, so the first
+request after a quiet period can take about a minute. Neon provides the
+database; the old suspended Cloud SQL instance and its backup are not modified.
 
 ### Frontend
 
-The frontend reads `VITE_API_URL` **at build time**, so changing the backend URL
-requires a redeploy of the frontend, not just an environment change. The backend
-must also list the frontend's origin in the CORS block in `backend/app/main.py`.
+The frontend reads `VITE_API_URL` at build time. Updating the API URL requires
+redeploying the frontend, and the API's `FRONTEND_URL` must match the deployed
+frontend origin.
