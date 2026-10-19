@@ -3,7 +3,7 @@
 REST API for [JobFlow](https://github.com/AndaniMagodi/job-flow-frontend), a South African job board with a built-in application tracker. Browse and search real SA listings, then track every application you make. Built with FastAPI and PostgreSQL.
 
 **Live app:** [JobFlow](https://job-flow-frontend.vercel.app)
-**Live API:** Deployment in progress.
+**Live API:** [JobFlow API docs](https://job-flow-backend-wb6l.onrender.com/docs) · [Health](https://job-flow-backend-wb6l.onrender.com/health)
 **Frontend Repo:** [job-flow-frontend](https://github.com/AndaniMagodi/job-flow-frontend)
 
 ---
