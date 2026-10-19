@@ -2,6 +2,7 @@
 
 REST API for [JobFlow](https://github.com/AndaniMagodi/job-flow-frontend), a South African job board with a built-in application tracker. Browse and search real SA listings, then track every application you make. Built with FastAPI and PostgreSQL.
 
+**Live app:** [JobFlow](https://job-flow-frontend.vercel.app)
 **Live API:** Deployment in progress.
 **Frontend Repo:** [job-flow-frontend](https://github.com/AndaniMagodi/job-flow-frontend)
 
@@ -19,7 +20,7 @@ REST API for [JobFlow](https://github.com/AndaniMagodi/job-flow-frontend), a Sou
 | Authentication | JWT (python-jose + bcrypt + passlib) |
 | Config | pydantic-settings |
 | Server | Uvicorn |
-| Deployment | Render |
+| Deployment | Render + Neon |
 
 ---
 
@@ -64,7 +65,7 @@ REST API for [JobFlow](https://github.com/AndaniMagodi/job-flow-frontend), a Sou
 
 ```bash
 git clone https://github.com/AndaniMagodi/job-flow-backend.git
-cd job-flow-backend
+cd job-flow-backend/backend
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -72,7 +73,7 @@ pip install -r requirements.txt
 
 ### Environment Variables
 
-Create a `.env` file in the root:
+Create a `.env` file in `backend/`:
 
 See [`backend/.env.example`](backend/.env.example) for the full list.
 
@@ -113,7 +114,7 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-API runs at `http://localhost:8000`  
+API runs at `http://localhost:8000`
 Interactive docs at `http://localhost:8000/docs`
 
 ---
@@ -222,9 +223,9 @@ came from.
 
 ## Deployment
 
-The Render Blueprint in `render.yaml` deploys the API from the `backend/`
-directory. It runs the Alembic migrations before starting Uvicorn and checks
-`/health`, which also verifies the database connection.
+The Render Blueprint in `render.yaml` deploys the API from `backend/`. It runs
+the Alembic migrations before starting Uvicorn and checks `/health`, which also
+verifies the database connection.
 
 Create a free PostgreSQL project in Neon and set its connection string as
 `DATABASE_URL` in Render. Also set a long, random `SECRET_KEY`. Keep both values
@@ -235,6 +236,8 @@ be added later through Render environment settings.
 Render's free web services sleep after 15 minutes without traffic, so the first
 request after a quiet period can take about a minute. Neon provides the
 database; the old suspended Cloud SQL instance and its backup are not modified.
+
+### Frontend
 
 The frontend reads `VITE_API_URL` at build time. Updating the API URL requires
 redeploying the frontend, and the API's `FRONTEND_URL` must match the deployed
