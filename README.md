@@ -228,8 +228,8 @@ the Alembic migrations before starting Uvicorn and checks `/health`, which also
 verifies the database connection.
 
 Create a free PostgreSQL project in Neon and set its connection string as
-`DATABASE_URL` in Render. Also set a long, random `SECRET_KEY`. Keep both values
-in Render's environment settings; never commit them to Git. `FRONTEND_URL` is
+`DATABASE_URL` in Render. Render generates the `SECRET_KEY` automatically. Keep
+the database URL in Render's environment settings; never commit it to Git. `FRONTEND_URL` is
 used for CORS and alert links. Optional integrations such as Groq and email can
 be added later through Render environment settings.
 

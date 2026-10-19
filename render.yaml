@@ -20,4 +20,4 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: SECRET_KEY
-        sync: false
+        generateValue: true
