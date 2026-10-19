@@ -19,7 +19,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://job-flow-frontend.vercel.app",
+        settings.frontend_url.rstrip("/"),
         "chrome-extension://kbpfbiijnkfhnebodhkkgfehdinkhbgl",
     ],
     allow_credentials=True,
